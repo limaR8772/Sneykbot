@@ -3,8 +3,8 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
-const TOKEN = '8604672862:AAEkDdMFaaK3i7lLo9sfM7_WhP4dsFNwvSo';
-const CHAT_ID = '26721408';
+const TOKEN = '8604672862:AAEkDdMFaaK3i7lLo9...'
+const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
 app.post('/webhook', async (req, res) => {
   try {
