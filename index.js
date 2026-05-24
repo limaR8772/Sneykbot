@@ -1,27 +1,33 @@
-
 const express = require('express');
 const app = express();
 app.use(express.json());
 
-const TOKEN = '8604672862:AAEkDdMFaaK3i7lLo9...'
-const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+const TOKEN = process.env.BOT_TOKEN;
+const CHAT_ID = process.env.CHAT_ID;
 
 app.post('/webhook', async (req, res) => {
   try {
     const data = req.body;
-    const msg = `📊 Янги Сигнал!\n🪙 ${data.ticker || data.pair}\n${data.type === 'BUY' ? '📈 BUY' : '📉 SELL'}\n💰 Нарх: ${data.price}\n✅ TP: ${data.tp}\n❌ SL: ${data.sl}`;
-    await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+    const message = `📊 Янги Сигнал!\n\n${JSON.stringify(data, null, 2)}`;
+    console.log('Webhook келди:', JSON.stringify(data));
+    console.log('TOKEN:', TOKEN ? 'бор' : 'йўқ');
+    console.log('CHAT_ID:', CHAT_ID);
+
+    const r = await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({chat_id: CHAT_ID, text: msg})
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: CHAT_ID, text: message }),
     });
-    res.json({ok: true});
-  } catch(e) {
-    res.json({ok: false});
+    const result = await r.json();
+    console.log('Telegram жавоби:', JSON.stringify(result));
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('Хато:', e.message);
+    res.json({ ok: false });
   }
 });
 
 app.get('/', (req, res) => res.send('Bot ishlayapti!'));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('Server started on port ' + PORT));
+app.listen(PORT, () => console.log(`Сервер ${PORT}-портда ишга тушди`));
